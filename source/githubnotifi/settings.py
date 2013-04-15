@@ -4,5 +4,5 @@
 # @copyright: (C) 2012-2013 Python Software Open Source
 
 """
-Modulo responsavel pelas configuracoes globais do software.
+Modulo responsável pelas configuracões globais do software.
 """
