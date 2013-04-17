@@ -8,6 +8,7 @@ Modulo responsável pelas interfaces gráficas utilizadas no software.
 """
 
 from PyQt4 import QtGui, QtCore
+from gitHubRequest import obter_notificacoes
 
 
 class IconeBandejaSistema(QtGui.QSystemTrayIcon):
@@ -24,11 +25,13 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
         if value == self.Trigger:
             self.left_menu.exec_(QtGui.QCursor.pos())
 
-    def show_mensagem(self, titulo, texto):
-        self.showMessage(titulo, texto)
+    def show_mensagem(self, titulo):
+        notificacoes = obter_notificacoes('CharlesGarrocho')
+        for i in notificacoes:
+            self.showMessage(titulo, i.obter_notificacao())
 
     def mensagem(self):
-    	self.show_mensagem('GitHubNotifi', 'Seja Bem Vindo ao GitHubNotifi! :-)')
+    	self.show_mensagem('GitHubNotifi')
 
 
 if __name__ == "__main__":
