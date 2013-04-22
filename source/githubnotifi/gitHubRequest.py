@@ -7,39 +7,53 @@
 Modulo responsável por realizar as requisições com a api do GitHub.
 """
 
-import requests
+import settings
+from os import path
+from json import loads
+from requests import get
 
 
 class Notificacao:
 
+	id_notificacao = None
 	nome_usuario = None
 	acao = None
-	nome_repositorio = None
+	repositorio = None
 
-	def __init__(self, nome_usuario, acao, nome_repositorio):
+	def __init__(self, id_notificacao, nome_usuario, acao, repositorio):
+		self.id_notificacao = id_notificacao
 		self.nome_usuario = nome_usuario
 		self.acao = acao
-		self.nome_repositorio = nome_repositorio
+		self.repositorio = repositorio
 
 	def obter_notificacao(self):
-		return '{0} {1} {2}'.format(self.nome_usuario, self.acao, self.nome_repositorio)
+		return '{0} {1} {2}'.format(self.nome_usuario, self.acao, self.repositorio)
 
 
 def obter_notificacoes(nome_usuario):
-	resposta = requests.get('https://api.github.com/users/{0}/received_events'.format(nome_usuario))
-	res_json = resposta.json()
 	notificacoes = []
-	for r in res_json:
-		nome_usuario = r['actor']['login']
-		try:
-			acao = r['payload']['action']
-		except:
-			acao = 'forked'
-		nome_repositorio = r['repo']['name']
-		notificacao = Notificacao(nome_usuario, acao, nome_repositorio)
-		notificacoes.append(notificacao)
+	try:
+		resposta = get('https://api.github.com/users/{0}/received_events'.format(nome_usuario))
+		res_json = resposta.json()
+		for r in res_json:
+			if not (path.exists('{0}/cache/{1}.json'.format(settings.path_media, r['id']))):
+				id_notificacao = r['id']
+				nome_usuario = r['actor']['login']
+				try:
+					acao = r['payload']['action']
+				except:
+					acao = 'forked'
+				repositorio = r['repo']['name']
+				notificacao = Notificacao(id_notificacao, nome_usuario, acao, repositorio)
+				notificacoes.append(notificacao)
+				grava_notificacao(notificacao)
+	except:
+		pass
 	return notificacoes
 
 
-if __name__ == '__main__':
-	obter_notificacoes('CharlesGarrocho')
+def grava_notificacao(notificacao):
+	dados = '{\"id\": \"' + notificacao.id_notificacao + '\",' + '\"nome_usuario\": ' + '\"' + notificacao.nome_usuario + '\",' + '\"acao\": ' + '\"' + notificacao.acao + '\",' + '\"repositorio\": ' + '\"' + notificacao.repositorio+ '\"}'
+	arq = open('{0}/cache/{1}.json'.format(settings.path_media, notificacao.id_notificacao), 'w')
+	arq.write(dados)
+	arq.close()
