@@ -7,8 +7,55 @@
 Modulo responsável pelas interfaces gráficas utilizadas no software.
 """
 
+import time
+import settings
 from PyQt4 import QtGui, QtCore
 from gitHubRequest import obter_notificacoes
+
+
+class AtualizarNotificacoes(QtCore.QThread):
+    """
+    Processo responsavel Atualizar as Notificações.
+    """
+    notificacao_sistema = QtCore.pyqtSignal(str)
+    
+    def run(self):
+        """
+        Inicia o processo de obter novas notificações.
+        """
+        while True:
+            notificacoes = obter_notificacoes('CharlesGarrocho')
+            for i in notificacoes:
+                self.notificacao_sistema.emit(i.obter_notificacao())
+            time.sleep(settings.PAUSE)
+
+
+class Menu(QtGui.QMenu):
+    def __init__(self, parent=None):
+        QtGui.QMenu.__init__(self, "Edit", parent)
+
+        acaoAbout = QtGui.QAction(QtGui.QIcon.fromTheme('help-about'), '&About', self)
+        acaoAbout.setShortcut('Ctrl+A')
+        acaoAbout.setStatusTip('Sobre o GitHubNotifi')
+        acaoAbout.triggered.connect(self.about)
+        self.addAction(acaoAbout)
+
+        acaoSignOut = QtGui.QAction(QtGui.QIcon.fromTheme('system-log-out'), '&Sign Out', self)
+        acaoSignOut.setShortcut('Ctrl+S')
+        acaoSignOut.setStatusTip('Trocar Conta')
+        #acaoSignOut.triggered.connect(QtGui.qApp.quit)
+        self.addAction(acaoSignOut)
+
+        acaoExit = QtGui.QAction(QtGui.QIcon.fromTheme('system-shutdown'), '&Exit', self)
+        acaoExit.setShortcut('Ctrl+E')
+        acaoExit.setStatusTip('Sair do GitHubNotifi')
+        acaoExit.triggered.connect(QtGui.qApp.quit)
+        self.addAction(acaoExit)
+
+    def about(self):
+        w = QtGui.QWidget()
+        msg = QtGui.QMessageBox
+        msg.information(w, 'About', "Octopy Multi-Clipboard Manager\n Developed by mRt.")
 
 
 class IconeBandejaSistema(QtGui.QSystemTrayIcon):
@@ -16,22 +63,23 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
     def __init__(self, parent=None):
         QtGui.QSystemTrayIcon.__init__(self, parent)
 
-        self.setIcon(QtGui.QIcon('../media/github-tray.png'))
+        self.setIcon(QtGui.QIcon('{0}/img/github-tray.png'.format(settings.path_media)))
         QtGui.QSystemTrayIcon.show(self)
 
-        QtCore.QTimer.singleShot(100, self.mensagem)
+        self.menu = Menu()
+        self.setContextMenu(self.menu)
 
-    def click_trap(self, value):
-        if value == self.Trigger:
-            self.left_menu.exec_(QtGui.QCursor.pos())
+        # Conectando a varável notificação do sistema do processo a função show mensagem.
+        self.AtuaNoti = AtualizarNotificacoes()
+        self.AtuaNoti.notificacao_sistema.connect(self.show_mensagem)
+        self.AtuaNoti.start()
 
-    def show_mensagem(self, titulo):
-        notificacoes = obter_notificacoes('CharlesGarrocho')
-        for i in notificacoes:
-            self.showMessage(titulo, i.obter_notificacao())
+    def show_mensagem(self, mensagem):
+        self.showMessage('GitHubNotifi', mensagem)
 
-    def mensagem(self):
-    	self.show_mensagem('GitHubNotifi')
+    def sair_menu(self):
+        #self.sair = True
+        print dir(self)
 
 
 if __name__ == "__main__":
