@@ -8,9 +8,9 @@ Modulo responsável por realizar as requisições com a api do GitHub.
 """
 
 import settings
-from os import path
 from json import loads
 from requests import get
+from os import path, makedirs
 
 
 class Notificacao:
@@ -57,3 +57,8 @@ def grava_notificacao(notificacao):
 	arq = open('{0}/cache/{1}.json'.format(settings.path_media, notificacao.id_notificacao), 'w')
 	arq.write(dados)
 	arq.close()
+
+
+def verifica_diretorio(diretorio):
+	if not path.exists(diretorio):
+		makedirs(diretorio)
