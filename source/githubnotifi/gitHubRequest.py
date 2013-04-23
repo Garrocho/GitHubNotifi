@@ -35,6 +35,7 @@ def obter_notificacoes(nome_usuario):
 	try:
 		resposta = get('https://api.github.com/users/{0}/received_events'.format(nome_usuario))
 		res_json = resposta.json()
+		verifica_diretorio('{0}/cache'.format(settings.path_media))
 		for r in res_json:
 			if not (path.exists('{0}/cache/{1}.json'.format(settings.path_media, r['id']))):
 				id_notificacao = r['id']
