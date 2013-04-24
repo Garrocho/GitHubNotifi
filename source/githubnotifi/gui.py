@@ -35,27 +35,22 @@ class Menu(QtGui.QMenu):
         QtGui.QMenu.__init__(self, "Edit", parent)
 
         acaoAbout = QtGui.QAction(QtGui.QIcon.fromTheme('help-about'), '&About', self)
-        acaoAbout.setShortcut('Ctrl+A')
+        acaoAbout.setShortcut('A')
         acaoAbout.setStatusTip('Sobre o GitHubNotifi')
-        acaoAbout.triggered.connect(self.about)
+        #acaoAbout.triggered.connect(self.about)
         self.addAction(acaoAbout)
 
         acaoSignOut = QtGui.QAction(QtGui.QIcon.fromTheme('system-log-out'), '&Sign Out', self)
-        acaoSignOut.setShortcut('Ctrl+S')
+        acaoSignOut.setShortcut('S')
         acaoSignOut.setStatusTip('Trocar Conta')
         #acaoSignOut.triggered.connect(QtGui.qApp.quit)
         self.addAction(acaoSignOut)
 
         acaoExit = QtGui.QAction(QtGui.QIcon.fromTheme('system-shutdown'), '&Exit', self)
-        acaoExit.setShortcut('Ctrl+E')
+        acaoExit.setShortcut('E')
         acaoExit.setStatusTip('Sair do GitHubNotifi')
         acaoExit.triggered.connect(QtGui.qApp.quit)
         self.addAction(acaoExit)
-
-    def about(self):
-        w = QtGui.QWidget()
-        msg = QtGui.QMessageBox
-        msg.information(w, 'About', "Octopy Multi-Clipboard Manager\n Developed by mRt.")
 
 
 class IconeBandejaSistema(QtGui.QSystemTrayIcon):
