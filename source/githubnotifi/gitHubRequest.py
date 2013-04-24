@@ -38,13 +38,21 @@ def obter_notificacoes(nome_usuario):
 		verifica_diretorio('{0}/cache'.format(settings.path_media))
 		for r in res_json:
 			if not (path.exists('{0}/cache/{1}.json'.format(settings.path_media, r['id']))):
+				tipo = r['type']
 				id_notificacao = r['id']
 				nome_usuario = r['actor']['login']
-				try:
-					acao = r['payload']['action']
-				except:
+				if tipo == 'FollowEvent':
+					acao = 'started following'
+					repositorio = r['payload']['target']['login']
+				if tipo == 'CreateEvent':
+					acao = 'created repository'
+					repositorio = r['repo']['name']
+				if tipo == 'WatchEvent':
+					acao = 'starred'
+					repositorio = r['repo']['name']
+				elif tipo == 'ForkEvent':
 					acao = 'forked'
-				repositorio = r['repo']['name']
+					repositorio = r['repo']['name']
 				notificacao = Notificacao(id_notificacao, nome_usuario, acao, repositorio)
 				notificacoes.append(notificacao)
 				grava_notificacao(notificacao)
