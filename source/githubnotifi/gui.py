@@ -93,25 +93,23 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
 
         self.menu = QtGui.QMenu(parent)
 
-        acaoSignOut = QtGui.QAction(QtGui.QIcon('{0}/img/SIGN_OUT.png'.format(settings.path_media)), '&Sign Out', self)
-        acaoSignOut.setShortcut('S')
-        acaoSignOut.setStatusTip('Trocar Conta')
-        #acaoSignOut.triggered.connect(QtGui.qApp.quit)
-        self.menu.addAction(acaoSignOut)
-
-        #########################
         acaoAbout = QtGui.QAction(QtGui.QIcon('{0}/img/AJUDA.png'.format(settings.path_media)), '&About', self)
         acaoAbout.setShortcut('A')
         acaoAbout.setStatusTip('Sobre o GitHubNotifi')
         acaoAbout.triggered.connect(self.dialogoShow)
         self.menu.addAction(acaoAbout)
 
+        acaoSignOut = QtGui.QAction(QtGui.QIcon('{0}/img/SIGN_OUT.png'.format(settings.path_media)), '&Sign Out', self)
+        acaoSignOut.setShortcut('S')
+        acaoSignOut.setStatusTip('Trocar Conta')
+        #acaoSignOut.triggered.connect(QtGui.qApp.quit)
+        self.menu.addAction(acaoSignOut)
+
         acaoExit = QtGui.QAction(QtGui.QIcon('{0}/img/SAIR.png'.format(settings.path_media)), '&Exit', self)
         acaoExit.setShortcut('E')
         acaoExit.setStatusTip('Sair do GitHubNotifi')
         acaoExit.triggered.connect(QtGui.qApp.quit)
         self.menu.addAction(acaoExit)
-        ###############################
 
         self.exSobre = DialogoSobre()
         self.setContextMenu(self.menu)
