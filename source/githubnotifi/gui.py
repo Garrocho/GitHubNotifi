@@ -35,7 +35,7 @@ class DialogoSobre(QtGui.QDialog):
         self.vbox = QtGui.QHBoxLayout()
         self.setLayout(self.vbox)
         self.foto_label = QtGui.QLabel()
-        self.foto_label.setPixmap(QtGui.QPixmap('{0}/img/octocat.png'.format(settings.path_media)))
+        self.foto_label.setPixmap(QtGui.QPixmap('{0}/img/LOGO.png'.format(settings.path_media)))
         self.label = QtGui.QLabel('<H3>Informacoes do software</H3> <b>Software: </b>GitHubNotifi<br> <b>Versao: </b> 1.0 <br> <b>Copyright: </b>Open Source<br> <H3>Desenvolvedor</H3> Charles Tim Batista Garrocho')
     
     def adicionar(self):
@@ -51,7 +51,7 @@ class DialogoSobre(QtGui.QDialog):
         """
         self.setModal(True)
         self.setWindowTitle('GitHubNotifi - Sobre o Software')
-        self.setWindowIcon(QtGui.QIcon('{0}/img/github-tray.png'.format(settings.path_media)))
+        self.setWindowIcon(QtGui.QIcon('{0}/img/TRAY.png'.format(settings.path_media)))
         self.setFixedSize(440, 215)
         self.screen = QtGui.QDesktopWidget().screenGeometry()
         self.size = self.geometry()
@@ -88,25 +88,25 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
     def __init__(self, parent=None):
         QtGui.QSystemTrayIcon.__init__(self, parent)
 
-        self.setIcon(QtGui.QIcon('{0}/img/github-tray.png'.format(settings.path_media)))
+        self.setIcon(QtGui.QIcon('{0}/img/TRAY.png'.format(settings.path_media)))
         QtGui.QSystemTrayIcon.show(self)
 
         self.menu = QtGui.QMenu(parent)
 
-        #########################
-        acaoAbout = QtGui.QAction(QtGui.QIcon.fromTheme('help-about'), '&About', self)
-        acaoAbout.setShortcut('A')
-        acaoAbout.setStatusTip('Sobre o GitHubNotifi')
-        acaoAbout.triggered.connect(self.dialogoShow)
-        self.menu.addAction(acaoAbout)
-
-        acaoSignOut = QtGui.QAction(QtGui.QIcon.fromTheme('system-log-out'), '&Sign Out', self)
+        acaoSignOut = QtGui.QAction(QtGui.QIcon('{0}/img/SIGN_OUT.png'.format(settings.path_media)), '&Sign Out', self)
         acaoSignOut.setShortcut('S')
         acaoSignOut.setStatusTip('Trocar Conta')
         #acaoSignOut.triggered.connect(QtGui.qApp.quit)
         self.menu.addAction(acaoSignOut)
 
-        acaoExit = QtGui.QAction(QtGui.QIcon.fromTheme('system-shutdown'), '&Exit', self)
+        #########################
+        acaoAbout = QtGui.QAction(QtGui.QIcon('{0}/img/AJUDA.png'.format(settings.path_media)), '&About', self)
+        acaoAbout.setShortcut('A')
+        acaoAbout.setStatusTip('Sobre o GitHubNotifi')
+        acaoAbout.triggered.connect(self.dialogoShow)
+        self.menu.addAction(acaoAbout)
+
+        acaoExit = QtGui.QAction(QtGui.QIcon('{0}/img/SAIR.png'.format(settings.path_media)), '&Exit', self)
         acaoExit.setShortcut('E')
         acaoExit.setStatusTip('Sair do GitHubNotifi')
         acaoExit.triggered.connect(QtGui.qApp.quit)
@@ -120,13 +120,6 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
         self.AtuaNoti = AtualizarNotificacoes()
         self.AtuaNoti.notificacao_sistema.connect(self.show_mensagem)
         self.AtuaNoti.start()
-
-    def showff(self):
-        self.aboutdialog = QtGui.QWidget()
-        reply = QtGui.QMessageBox.information(self.aboutdialog, self.tr("About Tunarium"), self.tr("Your text here."), QtGui.QMessageBox.Close)
-        if reply == QtGui.QMessageBox.Close:
-            print 'sim'
-            self.aboutdialog.hide()
 
     def dialogoShow(self):
         """
