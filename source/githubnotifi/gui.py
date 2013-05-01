@@ -67,15 +67,19 @@ class AtualizarNotificacoes(QtCore.QThread):
     Processo responsavel Atualizar as Notificações.
     """
     notificacao_sistema = QtCore.pyqtSignal(str)
+    conta = 'CharlesGarrocho'
     
     def run(self):
         """
         Inicia o processo de obter novas notificações.
         """
         while True:
-            notificacoes = obter_notificacoes('CharlesGarrocho')
-            for i in notificacoes:
-                self.notificacao_sistema.emit(i.obter_notificacao())
+            notificacoes = obter_notificacoes(self.conta)
+            if notificacoes == None:
+                self.notificacao_sistema.emit('{0} configurado com sucesso!'.format(self.conta))
+            else:
+                for i in notificacoes:
+                    self.notificacao_sistema.emit(i.obter_notificacao())
             time.sleep(settings.PAUSE)
 
 

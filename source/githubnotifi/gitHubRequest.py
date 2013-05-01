@@ -32,10 +32,12 @@ class Notificacao:
 
 def obter_notificacoes(nome_usuario):
 	notificacoes = []
+	novo_diretorio = False
 	try:
 		resposta = get('https://api.github.com/users/{0}/received_events'.format(nome_usuario))
 		res_json = resposta.json()
-		verifica_diretorio('{0}/cache'.format(settings.path_media))
+		if verifica_diretorio('{0}/cache'.format(settings.path_media)) == True:
+			novo_diretorio = True
 		for r in res_json:
 			if not (path.exists('{0}/cache/{1}.json'.format(settings.path_media, r['id']))):
 				tipo = r['type']
@@ -58,6 +60,8 @@ def obter_notificacoes(nome_usuario):
 				grava_notificacao(notificacao)
 	except:
 		pass
+	if novo_diretorio == True:
+		return None
 	return notificacoes
 
 
@@ -71,3 +75,5 @@ def grava_notificacao(notificacao):
 def verifica_diretorio(diretorio):
 	if not path.exists(diretorio):
 		makedirs(diretorio)
+		return True
+	return False
