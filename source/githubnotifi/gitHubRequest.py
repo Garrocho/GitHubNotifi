@@ -57,8 +57,6 @@ def obter_notificacoes(nome_usuario):
 				notificacoes.append(notificacao)
 				grava_notificacao(notificacao)
 	except:
-		pass
-	if novo_diretorio == True:
 		return None
 	return notificacoes
 

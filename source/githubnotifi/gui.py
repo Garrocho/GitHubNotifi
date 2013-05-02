@@ -13,6 +13,101 @@ from PyQt4 import QtGui, QtCore
 from gitHubRequest import obter_notificacoes, verifica_diretorio, verifica_usuario
 
 
+class AtualizarNotificacoes(QtCore.QThread):
+    """
+    Processo responsavel Atualizar as Notificações.
+    """
+    notificacao_sistema = QtCore.pyqtSignal(str)
+    
+    def run(self):
+        """
+        Inicia o processo de obter novas notificações.
+        """
+        while True:
+            erros = []
+            if verifica_diretorio('{0}/login'.format(settings.path_media)) == True:
+                erros.append('Login')
+            if verifica_diretorio('{0}/cache'.format(settings.path_media)) == True:
+                erros.append('Cache')
+            if len(erros) == 1:
+                self.notificacao_sistema.emit('Diretorio {0} criado com sucesso!'.format(erros[0]))
+            elif len(erros) == 2:
+                self.notificacao_sistema.emit('Diretorios {0} e {1} criado com sucesso!'.format(erros[0], erros[1]))
+            
+            usuario = verifica_usuario()
+            if usuario == None:
+                self.notificacao_sistema.emit('Nenhuma Conta Configurada...')
+            else:
+                notificacoes = obter_notificacoes(usuario)
+                if notificacoes == None:
+                    self.notificacao_sistema.emit('Sem Conexao Com a Internet...')
+                else:
+                    self.notificacao_sistema.emit('A Internet Voltou... :)')
+                    a = True
+                    try:
+                        erros.index('Cache')
+                        a = True
+                    except:
+                        a = False
+                    if a == True:
+                        for i in notificacoes:
+                            self.notificacao_sistema.emit(i.obter_notificacao())
+            time.sleep(settings.PAUSE)
+
+
+class IconeBandejaSistema(QtGui.QSystemTrayIcon):
+
+    def __init__(self, parent=None):
+        QtGui.QSystemTrayIcon.__init__(self, parent)
+
+        self.setIcon(QtGui.QIcon('{0}/img/TRAY.png'.format(settings.path_media)))
+        QtGui.QSystemTrayIcon.show(self)
+
+        self.menu = QtGui.QMenu(parent)
+
+        acaoAbout = QtGui.QAction(QtGui.QIcon('{0}/img/AJUDA.png'.format(settings.path_media)), '&About', self)
+        acaoAbout.setShortcut('A')
+        acaoAbout.setStatusTip('Sobre o GitHubNotifi')
+        acaoAbout.triggered.connect(self.showDialogoSobre)
+        self.menu.addAction(acaoAbout)
+
+        acaoSignOut = QtGui.QAction(QtGui.QIcon('{0}/img/USUARIO.png'.format(settings.path_media)), '&Sign Out', self)
+        acaoSignOut.setShortcut('S')
+        acaoSignOut.setStatusTip('Adicionar Conta')
+        acaoSignOut.triggered.connect(self.showDialogoLogin)
+        self.menu.addAction(acaoSignOut)
+
+        acaoExit = QtGui.QAction(QtGui.QIcon('{0}/img/SAIR.png'.format(settings.path_media)), '&Exit', self)
+        acaoExit.setShortcut('E')
+        acaoExit.setStatusTip('Sair do GitHubNotifi')
+        acaoExit.triggered.connect(QtGui.qApp.quit)
+        self.menu.addAction(acaoExit)
+
+        self.dialogoSobre = DialogoSobre()
+        self.dialogoLogin = DialogoLogin()
+        self.setContextMenu(self.menu)
+
+        # Conectando a varável notificação do sistema do processo a função show mensagem.
+        self.AtuaNoti = AtualizarNotificacoes()
+        self.AtuaNoti.notificacao_sistema.connect(self.show_mensagem)
+        self.AtuaNoti.start()
+
+    def showDialogoSobre(self):
+        """
+        Chama o dialogo Sobre.
+        """
+        self.dialogoSobre.exec_()
+
+    def showDialogoLogin(self):
+        """
+        Chama o dialogo Login.
+        """
+        self.dialogoLogin.exec_()
+
+    def show_mensagem(self, mensagem):
+        self.showMessage('GitHubNotifi', mensagem)
+
+
 class DialogoSobre(QtGui.QDialog):
     """
     Essa é a Interface gráfica do dialogo sobre, onde contém as informações de
@@ -62,88 +157,62 @@ class DialogoSobre(QtGui.QDialog):
         self.hide()
 
 
-class AtualizarNotificacoes(QtCore.QThread):
+class DialogoLogin(QtGui.QDialog):
     """
-    Processo responsavel Atualizar as Notificações.
+    Essa é a Interface gráfica do dialogo login, onde o usuário pode realizar o login de uma conta.
     """
-    notificacao_sistema = QtCore.pyqtSignal(str)
     
-    def run(self):
+    def __init__(self):
         """
-        Inicia o processo de obter novas notificações.
+        Realiza a contrucao da janela, chamando os metodos de construcao.
         """
-        while True:
-            erros = []
-            if verifica_diretorio('{0}/login'.format(settings.path_media)) == True:
-                erros.append('Login')
-            if verifica_diretorio('{0}/cache'.format(settings.path_media)) == True:
-                erros.append('Cache')
-            if len(erros) == 1:
-                self.notificacao_sistema.emit('Diretorio {0} criado com sucesso!'.format(erros[0]))
-            elif len(erros) == 2:
-                self.notificacao_sistema.emit('Diretorios {0} e {1} criado com sucesso!'.format(erros[0], erros[1]))
-            
-            usuario = verifica_usuario()
-            if usuario == None:
-                self.notificacao_sistema.emit('Nenhuma Conta Configurada...')
-            else:
-                obter_notificacoes(usuario)
-                a = True
-                try:
-                    erros.index('Cache')
-                    a = True
-                except:
-                    a = False
-                if a == True:
-                    for i in notificacoes:
-                        self.notificacao_sistema.emit(i.obter_notificacao())
-            time.sleep(settings.PAUSE)
-
-
-class IconeBandejaSistema(QtGui.QSystemTrayIcon):
-
-    def __init__(self, parent=None):
-        QtGui.QSystemTrayIcon.__init__(self, parent)
-
-        self.setIcon(QtGui.QIcon('{0}/img/TRAY.png'.format(settings.path_media)))
-        QtGui.QSystemTrayIcon.show(self)
-
-        self.menu = QtGui.QMenu(parent)
-
-        acaoAbout = QtGui.QAction(QtGui.QIcon('{0}/img/AJUDA.png'.format(settings.path_media)), '&About', self)
-        acaoAbout.setShortcut('A')
-        acaoAbout.setStatusTip('Sobre o GitHubNotifi')
-        acaoAbout.triggered.connect(self.dialogoShow)
-        self.menu.addAction(acaoAbout)
-
-        acaoSignOut = QtGui.QAction(QtGui.QIcon('{0}/img/SIGN_OUT.png'.format(settings.path_media)), '&Sign Out', self)
-        acaoSignOut.setShortcut('S')
-        acaoSignOut.setStatusTip('Trocar Conta')
-        #acaoSignOut.triggered.connect(QtGui.qApp.quit)
-        self.menu.addAction(acaoSignOut)
-
-        acaoExit = QtGui.QAction(QtGui.QIcon('{0}/img/SAIR.png'.format(settings.path_media)), '&Exit', self)
-        acaoExit.setShortcut('E')
-        acaoExit.setStatusTip('Sair do GitHubNotifi')
-        acaoExit.triggered.connect(QtGui.qApp.quit)
-        self.menu.addAction(acaoExit)
-
-        self.exSobre = DialogoSobre()
-        self.setContextMenu(self.menu)
-
-        # Conectando a varável notificação do sistema do processo a função show mensagem.
-        self.AtuaNoti = AtualizarNotificacoes()
-        self.AtuaNoti.notificacao_sistema.connect(self.show_mensagem)
-        self.AtuaNoti.start()
-
-    def dialogoShow(self):
+        super(DialogoLogin, self).__init__()
+        self.iniciar()
+        self.adicionar()
+        self.configurar()
+        
+    def iniciar(self):
         """
-        Chama o dialogo Sobre.
+        Realiza a instancia de varios componentes da janela.
         """
-        self.exSobre.exec_()
+        self.boxRotulo = QtGui.QVBoxLayout()
+        self.boxCampoTexto = QtGui.QVBoxLayout()
+        self.boxRotuloCampo = QtGui.QHBoxLayout()
 
-    def show_mensagem(self, mensagem):
-        self.showMessage('GitHubNotifi', mensagem)
+        self.boxBotoes = QtGui.QHBoxLayout()
+
+        self.boxTotal = QtGui.QHBoxLayout()
+        self.setLayout(self.boxTotal)
+
+        self.rotuloUsername = QtGui.QLabel('<H3>Username</H3>')
+    
+    def adicionar(self):
+        """
+        Adiciona todos os componentes na janela inicial.
+        """
+        self.boxRotulo.addWidget(self.rotuloUsername)
+
+        self.boxRotuloCampo.addLayout(self.boxRotulo)
+        self.boxRotuloCampo.addLayout(self.boxCampoTexto)
+
+        self.boxTotal.addLayout(self.boxRotuloCampo)
+        self.boxTotal.addLayout(self.boxBotoes)
+
+    def configurar(self):
+        """
+        Configura todos os componentes da janela.
+        """
+        self.setModal(True)
+        self.setWindowTitle('GitHubNotifi - Login')
+        self.setWindowIcon(QtGui.QIcon('{0}/img/TRAY.png'.format(settings.path_media)))
+        self.setFixedSize(440, 300)
+        self.screen = QtGui.QDesktopWidget().screenGeometry()
+        self.size = self.geometry()
+        self.move((self.screen.width() - self.size.width()) / 2, (self.screen.height() - self.size.height()) / 2)
+
+    def closeEvent(self, event):
+        event.ignore()
+        self.hide()
 
 
 if __name__ == "__main__":
