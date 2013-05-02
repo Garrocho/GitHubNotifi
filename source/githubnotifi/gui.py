@@ -10,7 +10,7 @@ Modulo responsável pelas interfaces gráficas utilizadas no software.
 import time
 import settings
 from PyQt4 import QtGui, QtCore
-from gitHubRequest import obter_notificacoes
+from gitHubRequest import obter_notificacoes, verifica_diretorio
 
 
 class DialogoSobre(QtGui.QDialog):
@@ -67,17 +67,27 @@ class AtualizarNotificacoes(QtCore.QThread):
     Processo responsavel Atualizar as Notificações.
     """
     notificacao_sistema = QtCore.pyqtSignal(str)
-    conta = 'CharlesGarrocho'
     
     def run(self):
         """
         Inicia o processo de obter novas notificações.
         """
         while True:
-            notificacoes = obter_notificacoes(self.conta)
-            if notificacoes == None:
-                self.notificacao_sistema.emit('{0} configurado com sucesso!'.format(self.conta))
+            erros = []
+            if verifica_diretorio('{0}/login'.format(settings.path_media)) == True:
+                erros.append('Login')
+            if verifica_diretorio('{0}/cache'.format(settings.path_media)) == True:
+                erros.append('Cache')
+            if len(erros) == 1
+                self.notificacao_sistema.emit('Diretório {0} criado com sucesso!'.format(self.conta))
+            elif len(erros) == 2:
+                self.notificacao_sistema.emit('Diretórios {0} e {1} criado com sucesso!'.format(erros[0], erros[1]))
+            
+            usuario = verifica_usuario()
+            if usuario == None:
+                self.notificacao_sistema.emit('Nenhuma Conta Configurada...')
             else:
+                obter_notificacoes(usuario)
                 for i in notificacoes:
                     self.notificacao_sistema.emit(i.obter_notificacao())
             time.sleep(settings.PAUSE)
