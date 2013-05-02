@@ -80,7 +80,7 @@ def verifica_diretorio(diretorio):
 def verifica_usuario():
 	if not path.exists('{0}/login/user.json'.format(settings.path_media)):
 		arq = open('{0}/login/user.json'.format(settings.path_media), 'w')
-		arq.write(dados)
+		arq.write("[\"\"]")
 		arq.close()
 	else:
 		arq = open('{0}/login/user.json'.format(settings.path_media)).read()
