@@ -36,7 +36,7 @@ class AtualizarNotificacoes(QtCore.QThread):
             
             usuario = verifica_usuario()
             if usuario == None:
-                self.notificacao_sistema.emit('Nenhuma Conta Configurada...')
+                self.notificacao_sistema.emit('CONTA')
             else:
                 notificacoes = obter_notificacoes(usuario)
                 if notificacoes == None:
@@ -65,17 +65,13 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
 
         self.menu = QtGui.QMenu(parent)
 
+        self.verificaUser()
+
         acaoAbout = QtGui.QAction(QtGui.QIcon('{0}/img/AJUDA.png'.format(settings.path_media)), '&About', self)
         acaoAbout.setShortcut('A')
         acaoAbout.setStatusTip('Sobre o GitHubNotifi')
         acaoAbout.triggered.connect(self.showDialogoSobre)
         self.menu.addAction(acaoAbout)
-
-        acaoSignOut = QtGui.QAction(QtGui.QIcon('{0}/img/USUARIO.png'.format(settings.path_media)), '&Sign Out', self)
-        acaoSignOut.setShortcut('S')
-        acaoSignOut.setStatusTip('Adicionar Conta')
-        acaoSignOut.triggered.connect(self.showDialogoLogin)
-        self.menu.addAction(acaoSignOut)
 
         acaoExit = QtGui.QAction(QtGui.QIcon('{0}/img/SAIR.png'.format(settings.path_media)), '&Exit', self)
         acaoExit.setShortcut('E')
@@ -92,6 +88,19 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
         self.AtuaNoti.notificacao_sistema.connect(self.show_mensagem)
         self.AtuaNoti.start()
 
+    def verificaUser(self):
+        user = verifica_usuario()
+        self.acaoUser = None
+        if user != None:
+            self.acaoUser = QtGui.QAction(QtGui.QIcon('{0}/img/SIGN_OUT.png'.format(settings.path_media)), '&Sign Out - {0}'.format(user), self)
+            self.acaoUser.setShortcut('S')
+            self.acaoUser.setStatusTip('Deslogar Conta')
+        else:
+            self.acaoUser = QtGui.QAction(QtGui.QIcon('{0}/img/USUARIO.png'.format(settings.path_media)), '&Sign In', self)
+            self.acaoUser.setStatusTip('Adicionar Conta')
+            self.acaoUser.triggered.connect(self.showDialogoLogin)
+        self.menu.addAction(self.acaoUser)
+
     def showDialogoSobre(self):
         """
         Chama o dialogo Sobre.
@@ -105,7 +114,13 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
         self.dialogoLogin.exec_()
 
     def show_mensagem(self, mensagem):
-        self.showMessage('GitHubNotifi', mensagem)
+        if mensagem == 'CONTA':
+            self.showMessage('GitHubNotifi', 'Nenhuma Conta Configurada...')
+            self.acaoUser.setIcon(QtGui.QIcon('{0}/img/USUARIO.png'.format(settings.path_media)))
+            self.acaoUser.setStatusTip('Adicionar Conta')
+            self.acaoUser.triggered.connect(self.showDialogoLogin)
+        else:
+            self.showMessage('GitHubNotifi', mensagem)
 
 
 class DialogoSobre(QtGui.QDialog):
