@@ -71,23 +71,28 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
             self.acaoUser = QtGui.QAction(QtGui.QIcon('{0}/img/USUARIO.png'.format(settings.path_media)), '&Sign In', self)
             self.acaoUser.setStatusTip('Logar Conta')
         else:
-            self.acaoUser = QtGui.QAction(QtGui.QIcon('{0}/img/SIGN_OUT.png'.format(settings.path_media)), '&Sign Out - {0}'.format(user), self)
+            self.userName = QtGui.QAction('{0}'.format(user), self)
+            self.menu.addAction(self.userName)
+            self.menu.addSeparator()
+            self.acaoUser = QtGui.QAction(QtGui.QIcon('{0}/img/SIGN_OUT.png'.format(settings.path_media)), '&Sign Out', self)
             self.acaoUser.setShortcut('S')
         
         self.acaoUser.triggered.connect(self.showDialogoAddAcount)
         self.menu.addAction(self.acaoUser)
+        self.menu.addSeparator()
 
         acaoAbout = QtGui.QAction(QtGui.QIcon('{0}/img/AJUDA.png'.format(settings.path_media)), '&Help', self)
         acaoAbout.setShortcut('H')
         acaoAbout.setStatusTip('Sobre o GitHubNotifi')
         acaoAbout.triggered.connect(self.showDialogoSobre)
         self.menu.addAction(acaoAbout)
+        self.menu.addSeparator()
 
         acaoExit = QtGui.QAction(QtGui.QIcon('{0}/img/SAIR.png'.format(settings.path_media)), '&Exit', self)
         acaoExit.setShortcut('E')
         acaoExit.setStatusTip('Sair do GitHubNotifi')
         acaoExit.triggered.connect(QtGui.qApp.quit)
-        self.menu.addAction(acaoExit)
+        self.menu.addAction(acaoExit) 
 
         self.dialogoSobre = DialogoSobre()
         self.dialogoAddAcount = DialogoAddAcount()
