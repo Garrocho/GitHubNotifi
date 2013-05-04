@@ -65,10 +65,21 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
 
         self.menu = QtGui.QMenu(parent)
 
-        self.verificaUser()
+        user = verifica_usuario()
+        self.acaoUser = None
+        if user == None:
+            self.show_mensagem('CONTA')
+            self.acaoUser = QtGui.QAction(QtGui.QIcon('{0}/img/USUARIO.png'.format(settings.path_media)), '&Sign In', self)
+            self.acaoUser.setStatusTip('Logar Conta')
+        else:
+            self.acaoUser = QtGui.QAction(QtGui.QIcon('{0}/img/SIGN_OUT.png'.format(settings.path_media)), '&Sign Out - {0}'.format(user), self)
+            self.acaoUser.setShortcut('S')
+        
+        self.acaoUser.triggered.connect(self.showDialogoAddAcount)
+        self.menu.addAction(self.acaoUser)
 
-        acaoAbout = QtGui.QAction(QtGui.QIcon('{0}/img/AJUDA.png'.format(settings.path_media)), '&About', self)
-        acaoAbout.setShortcut('A')
+        acaoAbout = QtGui.QAction(QtGui.QIcon('{0}/img/AJUDA.png'.format(settings.path_media)), '&Help', self)
+        acaoAbout.setShortcut('H')
         acaoAbout.setStatusTip('Sobre o GitHubNotifi')
         acaoAbout.triggered.connect(self.showDialogoSobre)
         self.menu.addAction(acaoAbout)
@@ -80,7 +91,7 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
         self.menu.addAction(acaoExit)
 
         self.dialogoSobre = DialogoSobre()
-        self.dialogoLogin = DialogoLogin()
+        self.dialogoAddAcount = DialogoAddAcount()
         self.setContextMenu(self.menu)
 
         # Conectando a varável notificação do sistema do processo a função show mensagem.
@@ -88,37 +99,21 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
         self.AtuaNoti.notificacao_sistema.connect(self.show_mensagem)
         self.AtuaNoti.start()
 
-    def verificaUser(self):
-        user = verifica_usuario()
-        self.acaoUser = None
-        if user != None:
-            self.acaoUser = QtGui.QAction(QtGui.QIcon('{0}/img/SIGN_OUT.png'.format(settings.path_media)), '&Sign Out - {0}'.format(user), self)
-            self.acaoUser.setShortcut('S')
-            self.acaoUser.setStatusTip('Deslogar Conta')
-        else:
-            self.acaoUser = QtGui.QAction(QtGui.QIcon('{0}/img/USUARIO.png'.format(settings.path_media)), '&Sign In', self)
-            self.acaoUser.setStatusTip('Adicionar Conta')
-            self.acaoUser.triggered.connect(self.showDialogoLogin)
-        self.menu.addAction(self.acaoUser)
-
     def showDialogoSobre(self):
         """
         Chama o dialogo Sobre.
         """
         self.dialogoSobre.exec_()
 
-    def showDialogoLogin(self):
+    def showDialogoAddAcount(self):
         """
-        Chama o dialogo Login.
+        Chama o dialogo Add acount.
         """
-        self.dialogoLogin.exec_()
+        self.dialogoAddAcount.exec_()
 
     def show_mensagem(self, mensagem):
         if mensagem == 'CONTA':
             self.showMessage('GitHubNotifi', 'Nenhuma Conta Configurada...')
-            self.acaoUser.setIcon(QtGui.QIcon('{0}/img/USUARIO.png'.format(settings.path_media)))
-            self.acaoUser.setStatusTip('Adicionar Conta')
-            self.acaoUser.triggered.connect(self.showDialogoLogin)
         else:
             self.showMessage('GitHubNotifi', mensagem)
 
@@ -172,16 +167,17 @@ class DialogoSobre(QtGui.QDialog):
         self.hide()
 
 
-class DialogoLogin(QtGui.QDialog):
+class DialogoAddAcount(QtGui.QDialog):
     """
-    Essa é a Interface gráfica do dialogo login, onde o usuário pode realizar o login de uma conta.
+    Essa é a Interface gráfica do dialogo de adicionar conta
+    onde o usuário pode realizar o login de uma conta.
     """
     
     def __init__(self):
         """
         Realiza a contrucao da janela, chamando os metodos de construcao.
         """
-        super(DialogoLogin, self).__init__()
+        super(DialogoAddAcount, self).__init__()
         self.iniciar()
         self.adicionar()
         self.configurar()
@@ -190,25 +186,32 @@ class DialogoLogin(QtGui.QDialog):
         """
         Realiza a instancia de varios componentes da janela.
         """
-        self.boxRotulo = QtGui.QVBoxLayout()
-        self.boxCampoTexto = QtGui.QVBoxLayout()
         self.boxRotuloCampo = QtGui.QHBoxLayout()
-
         self.boxBotoes = QtGui.QHBoxLayout()
+        self.boxTotal = QtGui.QVBoxLayout()
 
-        self.boxTotal = QtGui.QHBoxLayout()
         self.setLayout(self.boxTotal)
 
         self.rotuloUsername = QtGui.QLabel('<H3>Username</H3>')
-    
+        self.campoTextoUsername = QtGui.QLineEdit()
+
+        self.botaoGravar = QtGui.QPushButton(QtGui.QIcon('{0}/img/GRAVAR.png'.format(settings.path_media)), 'Gravar')
+        self.botaoGravar.setIconSize(QtCore.QSize(30,30));
+        self.botaoGravar.clicked.connect(self.close)
+        
+        self.botaoCancelar = QtGui.QPushButton(QtGui.QIcon('{0}/img/CANCELAR.png'.format(settings.path_media)), 'Cancelar')
+        self.botaoCancelar.setIconSize(QtCore.QSize(30,30));
+        self.botaoCancelar.clicked.connect(self.close)
+
     def adicionar(self):
         """
         Adiciona todos os componentes na janela inicial.
         """
-        self.boxRotulo.addWidget(self.rotuloUsername)
+        self.boxRotuloCampo.addWidget(self.rotuloUsername)
+        self.boxRotuloCampo.addWidget(self.campoTextoUsername)
 
-        self.boxRotuloCampo.addLayout(self.boxRotulo)
-        self.boxRotuloCampo.addLayout(self.boxCampoTexto)
+        self.boxBotoes.addWidget(self.botaoCancelar)
+        self.boxBotoes.addWidget(self.botaoGravar)
 
         self.boxTotal.addLayout(self.boxRotuloCampo)
         self.boxTotal.addLayout(self.boxBotoes)
