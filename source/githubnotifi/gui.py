@@ -42,7 +42,6 @@ class AtualizarNotificacoes(QtCore.QThread):
                 if notificacoes == None:
                     self.notificacao_sistema.emit('Sem Conexao Com a Internet...')
                 else:
-                    self.notificacao_sistema.emit('A Internet Voltou... :)')
                     a = True
                     try:
                         erros.index('Cache')
@@ -223,7 +222,7 @@ class DialogoAddAcount(QtGui.QDialog):
         self.setModal(True)
         self.setWindowTitle('GitHubNotifi - Login')
         self.setWindowIcon(QtGui.QIcon('{0}/img/TRAY.png'.format(settings.path_media)))
-        self.setFixedSize(440, 300)
+        self.setFixedSize(270, 100)
         self.screen = QtGui.QDesktopWidget().screenGeometry()
         self.size = self.geometry()
         self.move((self.screen.width() - self.size.width()) / 2, (self.screen.height() - self.size.height()) / 2)
