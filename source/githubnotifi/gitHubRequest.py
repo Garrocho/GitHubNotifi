@@ -31,6 +31,9 @@ class Notificacao:
 
 
 def obter_notificacoes(nome_usuario):
+	'''
+	Realiza as requisições a api do github para obter as notificações de uma determinada conta.
+	'''
 	notificacoes = []
 	novo_diretorio = False
 	try:
