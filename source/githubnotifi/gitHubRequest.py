@@ -14,7 +14,9 @@ from os import path, makedirs
 
 
 class Notificacao:
-
+	"""
+	Classe responsável por tratar adicionar notificações.
+	"""
 	id_notificacao = None
 	nome_usuario = None
 	acao = None
@@ -31,9 +33,9 @@ class Notificacao:
 
 
 def obter_notificacoes(nome_usuario):
-	'''
+	"""
 	Realiza as requisições a api do github para obter as notificações de uma determinada conta.
-	'''
+	"""
 	notificacoes = []
 	novo_diretorio = False
 	try:
