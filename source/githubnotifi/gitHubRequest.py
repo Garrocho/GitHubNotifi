@@ -67,6 +67,9 @@ def obter_notificacoes(nome_usuario):
 
 
 def grava_notificacao(notificacao):
+	"""
+	abre o arquivo cache e salva uma determinada notificação a partir de um id.
+	"""
 	dados = '{\"id\": \"' + notificacao.id_notificacao + '\",' + '\"nome_usuario\": ' + '\"' + notificacao.nome_usuario + '\",' + '\"acao\": ' + '\"' + notificacao.acao + '\",' + '\"repositorio\": ' + '\"' + notificacao.repositorio+ '\"}'
 	arq = open('{0}/cache/{1}.json'.format(settings.path_media, notificacao.id_notificacao), 'w')
 	arq.write(dados)
@@ -74,6 +77,9 @@ def grava_notificacao(notificacao):
 
 
 def verifica_diretorio(diretorio):
+	"""
+	Verifica se um diretorio existe, se não, cria o diretório e retorna True.
+	"""
 	if not path.exists(diretorio):
 		makedirs(diretorio)
 		return True
@@ -81,6 +87,9 @@ def verifica_diretorio(diretorio):
 
 
 def verifica_usuario():
+	"""
+	Verifica se uma conta de usuário está configurada no arquivo user na pasta login.
+	"""
 	verifica_diretorio('{0}/login'.format(settings.path_media))
 	if not path.exists('{0}/login/user.json'.format(settings.path_media)):
 		arq = open('{0}/login/user.json'.format(settings.path_media), 'w')
