@@ -10,7 +10,7 @@ Modulo responsável pelas interfaces gráficas utilizadas no software.
 import time
 import settings
 from PyQt4 import QtGui, QtCore
-from gitHubRequest import obter_notificacoes, verifica_diretorio, verifica_usuario
+from engine import obter_notificacoes, verifica_diretorio, verifica_usuario
 
 
 class AtualizarNotificacoes(QtCore.QThread):
