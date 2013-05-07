@@ -55,6 +55,9 @@ class AtualizarNotificacoes(QtCore.QThread):
 
 
 class IconeBandejaSistema(QtGui.QSystemTrayIcon):
+    """
+    Ícone de bandeja do software.
+    """
 
     def __init__(self, parent=None):
         QtGui.QSystemTrayIcon.__init__(self, parent)
@@ -116,6 +119,9 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
         self.dialogoAddAcount.exec_()
 
     def show_mensagem(self, mensagem):
+        """
+        Chama a função responsável por exibir a notificação do sistema.
+        """
         if mensagem == 'CONTA':
             self.showMessage('GitHubNotifi', 'Nenhuma Conta Configurada...')
         else:
