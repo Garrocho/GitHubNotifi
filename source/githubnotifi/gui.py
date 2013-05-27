@@ -18,6 +18,7 @@ class AtualizarNotificacoes(QtCore.QThread):
     Processo responsavel Atualizar as Notificações.
     """
     notificacao_sistema = QtCore.pyqtSignal(str)
+    notificacao_conta = QtCore.pyqtSignal(str)
     
     def run(self):
         """
@@ -38,19 +39,13 @@ class AtualizarNotificacoes(QtCore.QThread):
             if usuario == None:
                 self.notificacao_sistema.emit('CONTA')
             else:
+                self.notificacao_conta.emit(usuario)
                 notificacoes = obter_notificacoes(usuario)
                 if notificacoes == None:
                     self.notificacao_sistema.emit('Sem Conexao Com a Internet...')
                 else:
-                    a = True
-                    try:
-                        erros.index('Cache')
-                        a = True
-                    except:
-                        a = False
-                    if a == True:
-                        for i in notificacoes:
-                            self.notificacao_sistema.emit(i.obter_notificacao())
+                    for i in notificacoes:
+                        self.notificacao_sistema.emit(i.obter_notificacao())
             time.sleep(settings.PAUSE)
 
 
@@ -104,7 +99,11 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
         # Conectando a varável notificação do sistema do processo a função show mensagem.
         self.AtuaNoti = AtualizarNotificacoes()
         self.AtuaNoti.notificacao_sistema.connect(self.show_mensagem)
+        self.AtuaNoti.notificacao_conta.connect(self.nova_conta)
         self.AtuaNoti.start()
+
+    def nova_conta(self, mensagem):
+        dir(self.userName)
 
     def showDialogoSobre(self):
         """
@@ -248,6 +247,7 @@ class DialogoAddAcount(QtGui.QDialog):
         arq = open('{0}/login/user.json'.format(settings.path_media), 'w')
         arq.write(userName)
         arq.close()
+        self.close()
 
 
 if __name__ == "__main__":
