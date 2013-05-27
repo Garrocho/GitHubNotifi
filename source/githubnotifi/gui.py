@@ -207,7 +207,7 @@ class DialogoAddAcount(QtGui.QDialog):
 
         self.botaoGravar = QtGui.QPushButton(QtGui.QIcon('{0}/img/GRAVAR.png'.format(settings.path_media)), 'Gravar')
         self.botaoGravar.setIconSize(QtCore.QSize(30,30));
-        self.botaoGravar.clicked.connect(self.close)
+        self.botaoGravar.clicked.connect(self.gravar)
         
         self.botaoCancelar = QtGui.QPushButton(QtGui.QIcon('{0}/img/CANCELAR.png'.format(settings.path_media)), 'Cancelar')
         self.botaoCancelar.setIconSize(QtCore.QSize(30,30));
@@ -241,6 +241,13 @@ class DialogoAddAcount(QtGui.QDialog):
     def closeEvent(self, event):
         event.ignore()
         self.hide()
+
+    def gravar(self):
+        userName = '["'
+        userName += str(self.campoTextoUsername.text()) + '"]'
+        arq = open('{0}/login/user.json'.format(settings.path_media), 'w')
+        arq.write(userName)
+        arq.close()
 
 
 if __name__ == "__main__":
