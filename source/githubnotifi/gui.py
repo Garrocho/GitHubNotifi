@@ -43,7 +43,7 @@ class AtualizarNotificacoes(QtCore.QThread):
                 notificacoes = obter_notificacoes(usuario)
                 if notificacoes == None:
                     self.notificacao_sistema.emit('Sem Conexao Com a Internet...')
-                else:
+                elif len(erros) == 0:
                     for i in notificacoes:
                         self.notificacao_sistema.emit(i.obter_notificacao())
             time.sleep(settings.PAUSE)
@@ -123,8 +123,6 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
             self.userName.setText(usuario)
             self.acaoUser.setText('&Sign Out')
             self.acaoUser.setIcon(QtGui.QIcon('{0}/img/SIGN_OUT.png'.format(settings.path_media)))
-            print '\n\n-------------------\n\n'
-            print dir(self.acaoUser)
 
     def show_mensagem(self, mensagem):
         """
