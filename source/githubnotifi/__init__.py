@@ -11,6 +11,7 @@ __version__ = '0.1'
 __author__  = 'Charles Tim Batista Garrocho'
 
 __all__ = [
+    'app',
     'engine',
     'gui',
     'settings',
