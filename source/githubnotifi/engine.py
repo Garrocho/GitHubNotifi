@@ -100,4 +100,4 @@ def verifica_usuario():
 			arq_json = loads(arq)
 			if len(arq_json) != 0:
 				return arq_json[0]
-	return None
+	return 'Nenhuma Conta'
