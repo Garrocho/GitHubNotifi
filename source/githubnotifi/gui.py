@@ -63,15 +63,17 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
         self.menu = QtGui.QMenu(parent)
 
         user = verifica_usuario()
+
+        self.userName = QtGui.QAction('{0}'.format(user), self)
+        self.menu.addAction(self.userName)
+        self.menu.addSeparator()
+
         self.acaoUser = None
-        if user == None:
+        if user == 'Nenhuma Conta':
             self.show_mensagem('CONTA')
             self.acaoUser = QtGui.QAction(QtGui.QIcon('{0}/img/USUARIO.png'.format(settings.path_media)), '&Sign In', self)
             self.acaoUser.setStatusTip('Logar Conta')
         else:
-            self.userName = QtGui.QAction('{0}'.format(user), self)
-            self.menu.addAction(self.userName)
-            self.menu.addSeparator()
             self.acaoUser = QtGui.QAction(QtGui.QIcon('{0}/img/SIGN_OUT.png'.format(settings.path_media)), '&Sign Out', self)
             self.acaoUser.setShortcut('S')
         
@@ -116,6 +118,13 @@ class IconeBandejaSistema(QtGui.QSystemTrayIcon):
         Chama o dialogo Add acount.
         """
         self.dialogoAddAcount.exec_()
+        usuario = verifica_usuario()
+        if usuario != None:
+            self.userName.setText(usuario)
+            self.acaoUser.setText('&Sign Out')
+            self.acaoUser.setIcon(QtGui.QIcon('{0}/img/SIGN_OUT.png'.format(settings.path_media)))
+            print '\n\n-------------------\n\n'
+            print dir(self.acaoUser)
 
     def show_mensagem(self, mensagem):
         """
@@ -248,10 +257,3 @@ class DialogoAddAcount(QtGui.QDialog):
         arq.write(userName)
         arq.close()
         self.close()
-
-
-if __name__ == "__main__":
-    app = QtGui.QApplication([])
-    icone = IconeBandejaSistema()
-    icone.show()
-    app.exec_()
